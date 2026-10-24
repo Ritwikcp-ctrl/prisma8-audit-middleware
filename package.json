@@ -1,0 +1,27 @@
+{
+  "name": "extension-audit-middleware",
+  "version": "1.0.2",
+  "description": "Transaction-safe, diff-aware audit logging middleware for Prisma ORM 8.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "typescript": "^7.0.2"
+  },
+  "peerDependencies": {
+    "@prisma/orm-postgres": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5"
+  }
+}

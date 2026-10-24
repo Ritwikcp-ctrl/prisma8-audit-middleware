@@ -1,0 +1,21 @@
+// use prisma-8
+
+
+
+
+model User {
+  id        String   @id @onCreate(uuid())
+  email     String   @unique
+  username  String   @unique
+  name      String?
+}
+
+model AuditLog {
+  id        String   @id @onCreate(uuid())
+  action    String
+  model     String
+  actorId   String?
+  before    Json?
+  after     Json?
+  timestamp String  @default(now())
+}
