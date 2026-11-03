@@ -9,4 +9,8 @@ dist/
 .env.*
 
 # OS files
-.DS_Store
+.DS_Store*.tgz
+my-example/**/.agents/
+my-example/**/.claude/
+my-example/**/.cursor/
+my-example/**/.devin/

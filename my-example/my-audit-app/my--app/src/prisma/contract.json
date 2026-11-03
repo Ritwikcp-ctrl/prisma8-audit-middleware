@@ -8,6 +8,10 @@
       "model": "AuditLog",
       "namespace": "public"
     },
+    "Post": {
+      "model": "Post",
+      "namespace": "public"
+    },
     "User": {
       "model": "User",
       "namespace": "public"
@@ -19,7 +23,7 @@
         "models": {
           "AuditLog": {
             "fields": {
-              "action": {
+              "activityId": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/text@1",
@@ -33,28 +37,59 @@
                   "kind": "scalar"
                 }
               },
-              "after": {
-                "nullable": true,
-                "type": {
-                  "codecId": "pg/json@1",
-                  "kind": "scalar"
-                }
-              },
-              "before": {
-                "nullable": true,
-                "type": {
-                  "codecId": "pg/json@1",
-                  "kind": "scalar"
-                }
-              },
               "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/char@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 36
+                  }
+                }
+              },
+              "outcome": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/text@1",
                   "kind": "scalar"
                 }
               },
-              "model": {
+              "params": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/json@1",
+                  "kind": "scalar"
+                }
+              },
+              "parentActivityId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "rows": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/json@1",
+                  "kind": "scalar"
+                }
+              },
+              "sql": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "statement": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "table": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/text@1",
@@ -72,23 +107,35 @@
             "relations": {},
             "storage": {
               "fields": {
-                "action": {
-                  "column": "action"
+                "activityId": {
+                  "column": "activityId"
                 },
                 "actorId": {
                   "column": "actorId"
                 },
-                "after": {
-                  "column": "after"
-                },
-                "before": {
-                  "column": "before"
-                },
                 "id": {
                   "column": "id"
                 },
-                "model": {
-                  "column": "model"
+                "outcome": {
+                  "column": "outcome"
+                },
+                "params": {
+                  "column": "params"
+                },
+                "parentActivityId": {
+                  "column": "parentActivityId"
+                },
+                "rows": {
+                  "column": "rows"
+                },
+                "sql": {
+                  "column": "sql"
+                },
+                "statement": {
+                  "column": "statement"
+                },
+                "table": {
+                  "column": "table"
                 },
                 "timestamp": {
                   "column": "timestamp"
@@ -96,6 +143,70 @@
               },
               "namespaceId": "public",
               "table": "AuditLog"
+            }
+          },
+          "Post": {
+            "fields": {
+              "authorId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/char@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 36
+                  }
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/char@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 36
+                  }
+                }
+              },
+              "title": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "author": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "authorId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "authorId": {
+                  "column": "authorId"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "title": {
+                  "column": "title"
+                }
+              },
+              "namespaceId": "public",
+              "table": "Post"
             }
           },
           "User": {
@@ -110,8 +221,11 @@
               "id": {
                 "nullable": false,
                 "type": {
-                  "codecId": "pg/text@1",
-                  "kind": "scalar"
+                  "codecId": "sql/char@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 36
+                  }
                 }
               },
               "name": {
@@ -129,7 +243,23 @@
                 }
               }
             },
-            "relations": {},
+            "relations": {
+              "posts": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "authorId"
+                  ]
+                },
+                "to": {
+                  "model": "Post",
+                  "namespace": "public"
+                }
+              }
+            },
             "storage": {
               "fields": {
                 "email": {
@@ -160,7 +290,7 @@
           "table": {
             "AuditLog": {
               "columns": {
-                "action": {
+                "activityId": {
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
                   "nullable": false
@@ -170,22 +300,45 @@
                   "dataType": "pg/text",
                   "nullable": true
                 },
-                "after": {
-                  "codecId": "pg/json@1",
-                  "dataType": "pg/json",
-                  "nullable": true
-                },
-                "before": {
-                  "codecId": "pg/json@1",
-                  "dataType": "pg/json",
-                  "nullable": true
-                },
                 "id": {
+                  "codecId": "sql/char@1",
+                  "dataType": "pg/char",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 36
+                  }
+                },
+                "outcome": {
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
                   "nullable": false
                 },
-                "model": {
+                "params": {
+                  "codecId": "pg/json@1",
+                  "dataType": "pg/json",
+                  "nullable": false
+                },
+                "parentActivityId": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "rows": {
+                  "codecId": "pg/json@1",
+                  "dataType": "pg/json",
+                  "nullable": false
+                },
+                "sql": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "statement": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                },
+                "table": {
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
                   "nullable": false
@@ -193,15 +346,73 @@
                 "timestamp": {
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
-                  "default": {
-                    "expression": "now()",
-                    "kind": "function"
-                  },
                   "nullable": false
                 }
               },
               "foreignKeys": [],
               "indexes": [],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
+            "Post": {
+              "columns": {
+                "authorId": {
+                  "codecId": "sql/char@1",
+                  "dataType": "pg/char",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 36
+                  }
+                },
+                "id": {
+                  "codecId": "sql/char@1",
+                  "dataType": "pg/char",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 36
+                  }
+                },
+                "title": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "index": {
+                    "name": "Post_authorId_idx_e47547ed"
+                  },
+                  "source": {
+                    "columns": [
+                      "authorId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "Post"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "User"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "authorId"
+                  ],
+                  "name": "Post_authorId_idx_e47547ed",
+                  "prefix": "Post_authorId_idx",
+                  "unique": false
+                }
+              ],
               "primaryKey": {
                 "columns": [
                   "id"
@@ -217,9 +428,12 @@
                   "nullable": false
                 },
                 "id": {
-                  "codecId": "pg/text@1",
-                  "dataType": "pg/text",
-                  "nullable": false
+                  "codecId": "sql/char@1",
+                  "dataType": "pg/char",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 36
+                  }
                 },
                 "name": {
                   "codecId": "pg/text@1",
@@ -258,10 +472,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "905ea7dca73f466abf5bae2ffad6cb059e0ea780ac3ee5ed9b19abb714915a05"
+    "storageHash": "e17323bd7dd5b31e90916b5f61c9b348297facdfe433e9b420fadfb57dc20201"
   },
   "execution": {
-    "executionHash": "9d597fab6812c19f889b5b439cf89001674815a8540769fbc2167cae651e5f42",
+    "executionHash": "40197461c7a624dff1652eb55f63ceedc83919769144d5c5ea0aa6c09ac1b631",
     "mutations": {
       "defaults": [
         {
@@ -271,6 +485,17 @@
           },
           "ref": {
             "entry": "AuditLog",
+            "field": "id",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "Post",
             "field": "id",
             "namespace": "public"
           }
