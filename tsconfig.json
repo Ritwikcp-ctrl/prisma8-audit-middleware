@@ -7,7 +7,7 @@
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
-    "module": "nodenext",
+    "module": "preserve",
     "target": "ES2022",
     "types": ["node"],
     // For nodejs:
@@ -40,7 +40,9 @@
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
-    "moduleResolution":"nodenext",
+    "moduleResolution":"bundler",
+    
+    
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"]

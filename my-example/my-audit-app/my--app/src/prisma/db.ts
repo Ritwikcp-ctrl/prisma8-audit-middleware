@@ -1,35 +1,61 @@
-import 'dotenv/config';
-import postgres from '@prisma/orm-postgres/runtime';
-import { contractFromJson } from '@prisma/orm-postgres/static';
-import { auditMiddleware ,type AuditEvent} from '../../../../../src/index';
-import type { Contract } from './contract.d';
-import contractJson from './contract.json' with { type: 'json' };
+import "dotenv/config";
+import postgres from "@prisma/orm-postgres/runtime";
+import { contractFromJson } from "@prisma/orm-postgres/static";
+import { auditMiddleware } from "prisma-orm-extension-audit";
+import type { Contract } from "./contract.d";
+import contractJson from "./contract.json" with { type: "json" };
 
 const contract = contractFromJson<Contract>(contractJson);
 
-// The Clean Client (No middleware - used for auditing and pre-fetching)
-const baseDb = postgres({ contract, url: process.env.DATABASE_URL! });
+const auditDb = postgres({
+  contract,
+  url: process.env.DATABASE_URL!,
+});
 
-// The Main Client (With middleware - used for business logic)
+export const audit = auditMiddleware({
+  getActorId: () => "admin-user-99",
+  excludeTables: ["AuditLog"],
+  onAudit: async (entry) => {
+    await auditDb.orm.public.AuditLog.create({
+      table: entry.table,
+      statement: entry.statement,
+      sql: entry.sql,
+      params: entry.params as any,
+      rows: entry.rows as any,
+      actorId: entry.actorId ?? null,
+      activityId: entry.activityId,
+      parentActivityId: entry.parentActivityId ?? null,
+      outcome: entry.outcome,
+      timestamp: new Date().toISOString(),
+    });
+  },
+  onError: (err) => {
+    console.error("[Audit] sink failed:", err);
+  },
+  redact: (entry) => {
+    // Strip password-like fields before they reach the sink.
+    const redacted = {
+      ...entry,
+      params: entry.params.map((p) => {
+        if (typeof p === "object" && p !== null && "password" in p) {
+          return { ...p, password: "[REDACTED]" };
+        }
+        return p;
+      }),
+    };
+    return redacted;
+  },
+});
+
 export const db = postgres({
   contract,
   url: process.env.DATABASE_URL!,
-  middleware: [
-    auditMiddleware({
-      getDb: () => baseDb,
-      getActorId: () => "admin-user-99",
-      onAudit: async (event:AuditEvent) => {
-          console.log("INSERTING AUDIT LOG:", event);
-        await baseDb.orm.public.AuditLog.create({
-          action: event.action,
-          model: event.model,
-          actorId: event.actorId ?? null,
-          before: event.before as any,
-          after: event.after as any,
-          timestamp: event.timestamp.toISOString(),
-        });
-        console.log(`[Audit] Logged ${event.action} on ${event.model}`);
-      },
-    }),
-  ],
+  middleware: [audit.middleware],
 });
+
+// Call this in your shutdown handler, before db.close():
+export const closeDb = async () => {
+  await audit.flush();
+  await db.close();
+  await auditDb.close();
+};

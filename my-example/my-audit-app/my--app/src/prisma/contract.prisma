@@ -1,21 +1,31 @@
 // use prisma-8
 
-
-
-
 model User {
-  id        String   @id @onCreate(uuid())
-  email     String   @unique
-  username  String   @unique
+  id        UuidString @id @onCreate(uuid())
+  email     String     @unique
+  username  String     @unique
   name      String?
+
+  posts     Post[]
+}
+
+model Post {
+  id        UuidString @id @onCreate(uuid())
+  title     String
+  authorId  UuidString
+  author    User       @relation(fields: [authorId], references: [id])
 }
 
 model AuditLog {
-  id        String   @id @onCreate(uuid())
-  action    String
-  model     String
-  actorId   String?
-  before    Json?
-  after     Json?
-  timestamp String  @default(now())
+  id               UuidString @id @onCreate(uuid())
+  table            String
+  statement        String
+  sql              String
+  params           Json
+  rows             Json
+  actorId          String?
+  activityId       String
+  parentActivityId String?
+  outcome          String
+  timestamp        String
 }

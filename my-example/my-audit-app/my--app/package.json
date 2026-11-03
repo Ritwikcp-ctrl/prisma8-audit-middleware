@@ -26,26 +26,17 @@
   "dependencies": {
     "@prisma/composer": "^0.34.0",
     "@prisma/composer-prisma-cloud": "^0.34.0",
-    "@prisma/orm-postgres": "latest",
+    "@prisma/orm-postgres": "8.0.0-rc.21",
     "alchemy": "2.0.0-beta.83",
+    "prisma-orm-extension-audit": "file:../../../prisma-orm-extension-audit-3.1.0.tgz",
     "temporal-polyfill": "^1.0.6"
   },
   "devDependencies": {
     "@prisma/dev": "0.25.2",
     "@types/node": "^26.6.5",
-    "prisma": "8.0.0-rc.27",
+    "prisma": "8.0.0-rc.29",
     "tsdown": "^0.23.1",
     "tsx": "^4.23.15",
     "typescript": "^6.0.3"
-  },
-  "overrides": {
-    "effect": "4.0.3",
-    "@effect/platform-bun": "4.0.3",
-    "@effect/platform-node": "4.0.3",
-    "@effect/platform-node-shared": "4.0.3",
-    "@effect/sql-d1": "4.0.3",
-    "@effect/sql-sqlite-do": "4.0.3",
-    "@effect/vitest": "4.0.3",
-    "@vitejs/devtools": "0.7.6"
   }
 }

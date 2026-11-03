@@ -3,3 +3,4 @@ dist/
 .env
 /.alchemy
 /.prisma-composer
+*.tgz
