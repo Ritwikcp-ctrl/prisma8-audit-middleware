@@ -15,7 +15,7 @@ For every committed `INSERT`, `UPDATE`, `DELETE`, or raw statement sent through 
 | Field | Description |
 |---|---|
 | `table` | Physical table name from the SQL statement (`ast.table.name`). Respects `@@map`. `"unknown"` for raw statements. |
-| `statement` | `"insert" \| "update" \| "delete" \| "raw"`. **Upsert is recorded as `"insert"`** (`INSERT … ON CONFLICT DO UPDATE`). |
+| `statement` | `"insert" \| "update" \| "delete" \| "raw"`. **Upsert is recorded as `"insert"`** — the statement is `INSERT … ON CONFLICT DO UPDATE`, and **the SQL statement alone cannot tell whether the row was actually inserted or updated**. If you need to distinguish, check the returned `rows` against a prior state, or use a database trigger. |
 | `sql` | The rendered SQL text sent to the driver. |
 | `params` | Bound parameter values, in column order. **Primitives, not objects.** |
 | `rows` | Rows returned by `RETURNING` (via `onRow`). For `create`/`update`/`delete` this is the actual written row, including database defaults. Raw statements built with `.affectedCount()` return `[]`. |
